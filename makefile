@@ -15,7 +15,7 @@ GIT = /usr/bin/git
 
 CC = gcc
 
-CFLAGS += -g -Wall -O2 
+CFLAGS += -g -Wall -O2  -D_GNU_SOURCE
 CFLAGS += -I./libtsm/src -I./libtsm -I./libshl/src -I./fontstash/src
 CFLAGS += `sdl2-config --cflags`
 CFLAGS += -pg 
