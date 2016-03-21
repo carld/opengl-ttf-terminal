@@ -286,8 +286,8 @@ int main(int argc, char *argv[])
       SDL_Keysym k;
       SDL_TextInputEvent t;
       unsigned int mods = 0;
-      unsigned int scancode = 0;
-      unsigned int i;
+      unsigned int scancode = XKB_KEY_NoSymbol;
+      unsigned int i = 0;
       switch (event.type) {
         case SDL_KEYDOWN:
           k = event.key.keysym;
@@ -300,12 +300,10 @@ int main(int argc, char *argv[])
           if (k.sym == SDLK_DOWN) scancode = XKB_KEY_Down;
           if (k.sym == SDLK_LEFT) scancode = XKB_KEY_Left;
           if (k.sym == SDLK_RIGHT) scancode = XKB_KEY_Right;
-          if (scancode==XKB_KEY_Up || 
-                scancode==XKB_KEY_Down || 
-                scancode==XKB_KEY_Left || 
-                scancode==XKB_KEY_Right) {
-            tsm_vte_handle_keyboard(vte, scancode, k.sym, mods, 0);
-          }
+          if (k.sym == SDLK_RETURN) scancode = XKB_KEY_Return;
+          if (k.sym == SDLK_BACKSPACE) scancode = XKB_KEY_BackSpace;
+          if (k.sym == SDLK_TAB) scancode = XKB_KEY_Tab;
+          tsm_vte_handle_keyboard(vte, scancode, k.sym, mods, 0);
           break;
         case SDL_TEXTINPUT:
           t = event.text;
