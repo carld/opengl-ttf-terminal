@@ -27,6 +27,7 @@
 #include <math.h>
 #include <signal.h>
 #include <fcntl.h>
+#include <xkbcommon/xkbcommon.h>
 
 #include "SDL.h"
 #include "SDL_opengl.h"
@@ -255,6 +256,8 @@ int main(int argc, char *argv[])
   //renderer = SDL_CreateRenderer(screen, -1, 0);
   glctxt = SDL_GL_CreateContext(screen);
 
+
+  SDL_StartTextInput();
   //SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
 
   stash = glfonsCreate(512, 512, FONS_ZERO_TOPLEFT);
@@ -291,14 +294,15 @@ int main(int argc, char *argv[])
       unsigned int mods = 0;
       unsigned int scancode = XKB_KEY_NoSymbol;
       unsigned int i = 0;
+      unsigned ucs4 = 0;
       switch (event.type) {
-        case SDL_KEYDOWN:
+        case SDL_KEYDOWN: /* modifier key presses and function keys */
           k = event.key.keysym;
           if (k.mod & KMOD_CTRL)  mods |= TSM_CONTROL_MASK;
-          if (k.mod & KMOD_SHIFT) mods |= TSM_SHIFT_MASK;
+          //if (k.mod & KMOD_SHIFT) mods |= TSM_SHIFT_MASK;
           if (k.mod & KMOD_ALT)   mods |= TSM_ALT_MASK;
           //if (k.mod & KMOD_META)  mods |= TSM_LOGO_MASK;
-          /* map cursor keys to XKB scancodes to be escaped by libtsm vte */
+          /* map cursor keys etc to XKB scancodes to be escaped by libtsm vte */
           if (k.sym == SDLK_UP) scancode = XKB_KEY_Up;
           if (k.sym == SDLK_DOWN) scancode = XKB_KEY_Down;
           if (k.sym == SDLK_LEFT) scancode = XKB_KEY_Left;
@@ -306,11 +310,15 @@ int main(int argc, char *argv[])
           if (k.sym == SDLK_RETURN) scancode = XKB_KEY_Return;
           if (k.sym == SDLK_BACKSPACE) scancode = XKB_KEY_BackSpace;
           if (k.sym == SDLK_TAB) scancode = XKB_KEY_Tab;
-          tsm_vte_handle_keyboard(vte, scancode, k.sym, mods, 0);
+          if (k.sym == SDLK_ESCAPE) scancode = XKB_KEY_Escape;
+          //ucs4 = xkb_keysym_to_utf32(k.sym);
+          if (scancode != XKB_KEY_NoSymbol || mods != 0) {
+            tsm_vte_handle_keyboard(vte, scancode, k.sym, mods, ucs4);
+          }
           break;
-        case SDL_TEXTINPUT:
+        case SDL_TEXTINPUT: /* ordinary text input */
           t = event.text;
-          for (i=0; i < strlen(t.text); i++) {
+          for (i = 0; i < strlen(t.text); i++) {
             tsm_vte_handle_keyboard(vte, 0, 0, 0, t.text[i]);
           }
           break;

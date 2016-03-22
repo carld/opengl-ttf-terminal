@@ -21,7 +21,7 @@ CFLAGS += `sdl2-config --cflags`
 CFLAGS += -pg 
 
 LFLAGS += `sdl2-config --libs`
-LFLAGS += -lm -lGL
+LFLAGS += -lm -lGL -lxkbcommon
 
 TSM = $(wildcard libtsm/src/*.c) $(wildcard libtsm/external/*.c) 
 SHL = libshl/src/shl_pty.c
