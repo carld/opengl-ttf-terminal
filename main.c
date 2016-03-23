@@ -28,8 +28,13 @@
 #include <signal.h>
 #include <fcntl.h>
 
+#include <GL/glew.h>
+
+#define NO_SDL_GLEXT
+
 #include "SDL.h"
 #include "SDL_opengl.h"
+
 
 #define FONTSTASH_IMPLEMENTATION
 #include "fontstash.h"
@@ -39,6 +44,8 @@
 #include "libtsm.h"
 #include "shl_pty.h"
 #include "external/xkbcommon-keysyms.h"
+
+#include "shader.h"
 
 extern char **environ;
 
@@ -151,6 +158,7 @@ int main(int argc, char *argv[])
   int opt;
   const char *fontfile = "VeraMono.ttf";
   struct tsm_screen_attr attr;
+  GLhandleARB prg, shader;
 
   while ((opt = getopt(argc, argv, "f:s:g:m")) != -1) {
     switch (opt) {
@@ -272,6 +280,21 @@ int main(int argc, char *argv[])
 
   printf("console width: %d\n", tsm_screen_get_width(console));
   printf("console height: %d\n", tsm_screen_get_height(console));
+
+  glewInit();
+  if (GLEW_ARB_vertex_shader && GLEW_ARB_fragment_shader)
+    printf("GLSL supported\n");
+  else {
+    printf("No GLSL support\n");
+    exit(1);
+  }
+
+  shader = load_shaders("crt.glsl", GL_FRAGMENT_SHADER_ARB);
+  prg = glCreateProgramObjectARB();
+  glAttachObjectARB(prg,shader);
+  glLinkProgramARB(prg);
+  arb_info(prg);
+  glUseProgramObjectARB(prg);
 
   done = 0;
   while (!done) {

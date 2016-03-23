@@ -20,12 +20,12 @@ CFLAGS += `sdl-config --cflags`
 CFLAGS += -pg 
 
 LFLAGS += `sdl-config --libs`
-LFLAGS += -lm -lGL
+LFLAGS += -lm -lGL -lGLEW
 
 TSM = $(wildcard libtsm/src/*.c) $(wildcard libtsm/external/*.c) 
 SHL = libshl/src/shl_pty.c
 
-SRC = $(SHL) $(TSM) main.c
+SRC = $(SHL) $(TSM) main.c shader.c
 OBJ = $(SRC:.c=.o)
 BIN = togl
 
