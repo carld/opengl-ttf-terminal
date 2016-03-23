@@ -289,7 +289,7 @@ int main(int argc, char *argv[])
     exit(1);
   }
 
-  shader = load_shaders("crt.glsl", GL_FRAGMENT_SHADER_ARB);
+  shader = load_shaders("crt-lottes.glsl", GL_FRAGMENT_SHADER_ARB);
   prg = glCreateProgramObjectARB();
   glAttachObjectARB(prg,shader);
   glLinkProgramARB(prg);
